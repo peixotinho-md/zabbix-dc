@@ -181,8 +181,13 @@ async def main():
         log.warning("DISCORD_TOKEN/DISCORD_CHANNEL_ID vazios: rode ./lab.sh discord (ou 8-DISCORD.bat). "
                     "Até lá o Zabbix recebe 503 e o envio aparece como falha no Action log.")
         await asyncio.Event().wait()
-    async with cliente:
-        await cliente.start(TOKEN)
+    try:
+        async with cliente:
+            await cliente.start(TOKEN)
+    except discord.LoginFailure:
+        log.error("TOKEN RECUSADO PELO DISCORD (401). Use o token da aba Bot > Reset Token, "
+                  "nao o Application ID, a Public Key nem o Client Secret. Depois: ./lab.sh discord")
+        await asyncio.Event().wait()   # fica no ar respondendo 503 ao Zabbix, sem reiniciar em loop
 
 
 if __name__ == "__main__":

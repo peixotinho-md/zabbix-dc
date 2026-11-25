@@ -83,7 +83,13 @@ case "${1:-}" in
   discord)
     echo "Bot do Discord do NOC. Precisa de: token do bot e ID do canal (passo a passo no README)."
     read -rsp "Token do bot (nao aparece na tela): " T; echo
+    T=$(printf '%s' "$T" | tr -d ' "\r\n')
+    if [ "$(printf '%s' "$T" | tr -cd '.' | wc -c)" -ne 2 ] || [ ${#T} -lt 50 ]; then
+      echo "ERRO: isso nao parece o token do bot (ele tem ~70 caracteres e 2 pontos, tipo MTIz...Gx1a2b.abc...)."
+      echo "Pegue na aba Bot > Reset Token. Application ID, Public Key e Client Secret NAO servem."; exit 1
+    fi
     read -rp "ID do canal do NOC: " C
+    C=$(printf '%s' "$C" | tr -cd '0-9')
     read -rp "ID do cargo a marcar no Disaster (Enter = nenhum): " R
     umask 077
     printf 'DISCORD_TOKEN=%s\nDISCORD_CHANNEL_ID=%s\nDISCORD_ROLE_ID=%s\n' "$T" "$C" "$R" > discord.env
